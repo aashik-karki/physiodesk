@@ -3,6 +3,8 @@
 import { CalendarDays, LayoutDashboard, Receipt, Stethoscope, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LogOut } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/cn";
 
 const NAV = [
@@ -15,6 +17,7 @@ const NAV = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   return (
     <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col bg-secondary">
@@ -50,6 +53,21 @@ export function Sidebar() {
           );
         })}
       </nav>
+            {user && (
+        <div className="m-3 flex items-center gap-3 rounded-xl bg-secondary-light p-3">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary-soft text-sm font-semibold text-primary-ink">
+            {user.full_name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-white">{user.full_name}</p>
+            <p className="text-xs capitalize text-white/50">{user.role}</p>
+          </div>
+          <button onClick={logout} title="Sign out" aria-label="Sign out"
+            className="rounded-lg p-2 text-white/60 transition hover:bg-secondary hover:text-white">
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      )}
     </aside>
   );
 }
