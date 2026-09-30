@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+/* PhysioDesk design system: colours from the brief, nothing else. */
+@theme {
+  --color-primary: #b8763a;
+  --color-primary-ink: #5c3a17;        /* text on primary-soft */
+  --color-primary-soft: #f0dfc7;
+  --color-secondary: #132420;          /* sidebar */
+  --color-secondary-light: #1d362f;    /* sidebar hover */
+  --color-tertiary: #4f7c63;
+  --color-tertiary-soft: #e1ebe3;
+  --color-canvas: #f6f3ea;             /* page background */
+  --color-surface: #ffffff;            /* cards */
+  --color-border: #e4dfd1;
+  --color-ink: #1c2622;                /* main text */
+  --color-muted: #797365;              /* secondary text */
+
+  /* Status colours: only for pills/badges */
+  --color-success: #4f7c63;
+  --color-success-soft: #e1ebe3;
+  --color-danger: #b5493b;
+  --color-danger-soft: #f3deda;
+  --color-info: #5e6b78;
+  --color-info-soft: #e7ebee;
+
+  --radius-card: 14px;
+  --shadow-card: 0 1px 2px rgb(28 38 34 / 0.04), 0 6px 20px -8px rgb(28 38 34 / 0.12);
+}
+
+/* Fonts come from next/font (see layout.tsx) */
+@theme inline {
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  *, ::before, ::after { border-color: var(--color-border); }
+  body { @apply bg-canvas font-sans text-ink antialiased; }
+}
