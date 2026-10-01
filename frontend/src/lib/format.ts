@@ -24,3 +24,29 @@ export function initials(name: string): string {
     .slice(0, 2)
     .join("");
 }
+
+
+
+/** "2026-10-01T04:15:00Z" or "2026-10-01" -> "1 Oct 2026" */
+export function formatDate(value: string): string {
+  const d = value.length === 10 ? new Date(`${value}T00:00:00`) : new Date(value);
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+/** "15000.00" -> "Rs 15,000" (paisa shown only when non-zero) */
+export function formatMoney(value: string | number): string {
+  const n = typeof value === "string" ? Number(value) : value;
+  return `Rs ${n.toLocaleString("en-IN", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
+}
+
+export const PATIENT_STATUSES = [
+  { value: "active", label: "Active" },
+  { value: "on_hold", label: "On hold" },
+  { value: "completed", label: "Completed" },
+] as const;
+
+export const GENDERS = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "other", label: "Other" },
+] as const;

@@ -20,3 +20,24 @@ export function Field({ label, error, id, className, ...props }:
     </div>
   );
 }
+
+export function TextareaField({ label, error, id, className, ...props }:
+  React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string; error?: string }) {
+  const inputId = id ?? props.name;
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={inputId} className="block text-sm font-medium text-ink">{label}</label>
+      <textarea
+        id={inputId}
+        rows={3}
+        className={cn(
+          "w-full rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink transition",
+          "placeholder:text-muted/60 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15",
+          error ? "border-danger" : "border-border", className,
+        )}
+        {...props}
+      />
+      {error && <p className="text-xs text-danger">{error}</p>}
+    </div>
+  );
+}
