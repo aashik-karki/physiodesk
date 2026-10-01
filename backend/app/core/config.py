@@ -1,3 +1,5 @@
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -19,3 +21,13 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+
+def clinic_now() -> datetime:
+    return datetime.now(ZoneInfo(get_settings().clinic_timezone))
+
+
+def clinic_today() -> date:
+    """'Today' as the clinic in Kathmandu sees it, not the server's UTC clock."""
+    return clinic_now().date()    

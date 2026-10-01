@@ -1,3 +1,4 @@
+from app.core.errors import register_error_handlers
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
@@ -11,6 +12,8 @@ settings = get_settings()
 
 app = FastAPI(title="PhysioDesk API", version="0.1.0")
 
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in settings.cors_origins.split(",")],
@@ -18,6 +21,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+register_error_handlers(app)
 
 app.include_router(api_router)
 
