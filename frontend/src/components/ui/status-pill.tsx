@@ -7,6 +7,7 @@ const TONE_BY_STATUS: Record<string, Tone> = {
   active: "success", paid: "success", booked: "success", completed: "success",
   cancelled: "danger", void: "danger", no_show: "danger", overdue: "danger",
   on_hold: "info", due: "info", pending: "info",
+  on_duty: "success", off_today: "info",
 };
 
 const TONES: Record<Tone, string> = {
