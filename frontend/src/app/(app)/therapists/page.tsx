@@ -12,6 +12,7 @@ import { Alert, EmptyState, Skeleton } from "@/components/ui/feedback";
 import { useAuth } from "@/lib/auth";
 import { useTherapists } from "@/lib/queries/therapists";
 import type { Therapist } from "@/lib/types";
+   import { ScheduleExceptionsDialog } from "@/components/therapists/schedule-exceptions-dialog";
 
 export default function TherapistsPage() {
   const { isAdmin } = useAuth();
@@ -23,6 +24,7 @@ export default function TherapistsPage() {
   const [editing, setEditing] = useState<Therapist | null | undefined>(undefined);
   const [removing, setRemoving] = useState<Therapist | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+     const [exceptionsFor, setExceptionsFor] = useState<Therapist | null>(null);
 
   const onDuty = therapists?.filter((t) => t.on_duty_today).length ?? 0;
   const patientsToday = therapists?.reduce((sum, t) => sum + t.patients_today, 0) ?? 0;
@@ -84,7 +86,8 @@ export default function TherapistsPage() {
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {therapists.map((t) => (
               <TherapistCard key={t.id} therapist={t} canManage={isAdmin}
-                onEdit={() => setEditing(t)} onRemove={() => setRemoving(t)} />
+                onEdit={() => setEditing(t)} onRemove={() => setRemoving(t)}
+                   onExceptions={() => setExceptionsFor(t)} />
             ))}
           </div>
         )}
@@ -93,6 +96,7 @@ export default function TherapistsPage() {
       {editing !== undefined && (
         <TherapistForm key={editing?.id ?? "new"} open therapist={editing} onClose={() => setEditing(undefined)} />
       )}
+         {exceptionsFor && <ScheduleExceptionsDialog therapist={exceptionsFor} onClose={() => setExceptionsFor(null)} />}
       <RemoveTherapistDialog therapist={removing} onClose={() => setRemoving(null)} onRemoved={setNotice} />
     </>
   );

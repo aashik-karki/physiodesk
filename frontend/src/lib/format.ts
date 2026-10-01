@@ -50,3 +50,49 @@ export const GENDERS = [
   { value: "female", label: "Female" },
   { value: "other", label: "Other" },
 ] as const;
+
+
+
+export const SESSION_TYPES = [
+  { value: "assessment", label: "Assessment" },
+  { value: "treatment", label: "Treatment" },
+  { value: "follow_up", label: "Follow-up" },
+] as const;
+
+export const PAYMENT_METHODS = [
+  { value: "cash", label: "Cash" },
+  { value: "card", label: "Card" },
+  { value: "bank_transfer", label: "Bank transfer" },
+  { value: "digital_wallet", label: "eSewa / Khalti" },
+  { value: "package", label: "Prepaid package" },
+] as const;
+
+export function labelOf(list: readonly { value: string; label: string }[], value: string): string {
+  return list.find((x) => x.value === value)?.label ?? value;
+}
+
+/** Local calendar date as "YYYY-MM-DD" (not UTC, which can be a day off). */
+export function toISODate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export function todayISO(): string {
+  return toISODate(new Date());
+}
+
+export function addDays(iso: string, days: number): string {
+  const d = new Date(`${iso}T00:00:00`);
+  d.setDate(d.getDate() + days);
+  return toISODate(d);
+}
+
+/** "2026-10-01" -> "Thursday, 1 October" */
+export function formatLongDate(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+}
+
+/** "09:30:00" -> 570 (minutes since midnight) */
+export function toMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+}

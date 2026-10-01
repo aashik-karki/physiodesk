@@ -1,4 +1,4 @@
-import { Clock, Mail, Pencil, Phone, Trash2, Users } from "lucide-react";
+import { Clock, Mail, Pencil, Phone, Trash2, Users,CalendarCog } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { StatusPill } from "@/components/ui/status-pill";
 import { cn } from "@/lib/cn";
@@ -10,9 +10,12 @@ interface Props {
   canManage: boolean;
   onEdit: () => void;
   onRemove: () => void;
+  
+  onExceptions: () => void
 }
 
-export function TherapistCard({ therapist: t, canManage, onEdit, onRemove }: Props) {
+
+export function TherapistCard({ therapist: t, canManage, onEdit, onRemove, onExceptions }: Props) {
   return (
     <Card className="flex flex-col">
       <div className="flex items-start gap-4 p-5">
@@ -73,6 +76,10 @@ export function TherapistCard({ therapist: t, canManage, onEdit, onRemove }: Pro
               className="rounded-lg p-2 text-muted transition hover:bg-surface hover:text-ink">
               <Pencil className="h-4 w-4" />
             </button>
+               <button onClick={onExceptions} aria-label={`Days off and custom hours for ${t.full_name}`} title="Days off / custom hours"
+     className="rounded-lg p-2 text-muted transition hover:bg-surface hover:text-ink">
+     <CalendarCog className="h-4 w-4" />
+   </button>
             <button onClick={onRemove} aria-label={`Remove ${t.full_name}`} title="Remove"
               className="rounded-lg p-2 text-muted transition hover:bg-danger-soft hover:text-danger">
               <Trash2 className="h-4 w-4" />

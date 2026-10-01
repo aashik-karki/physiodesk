@@ -95,3 +95,75 @@ export interface PatientInput {
   therapist_id: number | null;
   package_id: number | null;
 }
+
+
+// ---- Schedule & appointments -------------------------------------------
+export type AppointmentStatus = "booked" | "completed" | "cancelled" | "no_show";
+export type SessionType = "assessment" | "treatment" | "follow_up";
+export type PaymentMethod = "cash" | "card" | "bank_transfer" | "digital_wallet" | "package";
+
+export interface Appointment {
+  id: number;
+  patient: { id: number; full_name: string; phone: string };
+  therapist: { id: number; full_name: string };
+  date: string;        // "2026-10-01"
+  start_time: string;  // "09:00:00"
+  end_time: string;
+  status: AppointmentStatus;
+  session_type: SessionType;
+  payment_method: PaymentMethod;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface AppointmentInput {
+  patient_id: number;
+  therapist_id: number;
+  date: string;
+  start_time: string;
+  session_type: SessionType;
+  payment_method: PaymentMethod;
+  notes: string | null;
+}
+
+export interface Slot {
+  start: string;
+  end: string;
+  state: "open" | "booked" | "past";
+  out_of_hours: boolean;
+  appointment: {
+    id: number;
+    patient_id: number;
+    patient_name: string;
+    status: AppointmentStatus;
+    session_type: SessionType;
+  } | null;
+}
+
+export interface TherapistDay {
+  therapist: { id: number; full_name: string; specialty: string; slot_minutes: number; is_active: boolean };
+  is_off: boolean;
+  off_reason: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  has_override: boolean;
+  slots: Slot[];
+  booked_count: number;
+  open_count: number;
+}
+
+export interface DaySchedule {
+  date: string;
+  therapists: TherapistDay[];
+}
+
+export interface ScheduleOverride {
+  id: number;
+  therapist_id: number;
+  date: string;
+  is_off: boolean;
+  start_time: string | null;
+  end_time: string | null;
+  reason: string | null;
+  created_at: string;
+}
