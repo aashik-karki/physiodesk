@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Pencil, Plus, Search, Trash2, Users } from "lucide-react";
+import { Pencil, Plus, Search, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDeferredValue, useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
@@ -9,6 +9,7 @@ import { PatientForm } from "@/components/patients/patient-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert, EmptyState, Skeleton } from "@/components/ui/feedback";
+import { FilterSelect } from "@/components/ui/filter-select";
 import { Pagination } from "@/components/ui/pagination";
 import { StatusPill } from "@/components/ui/status-pill";
 import { cn } from "@/lib/cn";
@@ -37,6 +38,10 @@ export default function PatientsPage() {
   // Any filter change goes back to page 1.
   const resetPage = <T,>(setter: (v: T) => void) => (v: T) => { setter(v); setPage(1); };
 
+  // Deleting the last patient on the last page would leave an empty page: step back.
+  const lastPage = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
+  if (data && !isFetching && page > lastPage) setPage(lastPage);
+
   return (
     <>
       <PageHeader
@@ -54,25 +59,12 @@ export default function PatientsPage() {
               placeholder="Search name or phone" aria-label="Search patients"
               className="h-10 w-full rounded-lg border border-border bg-surface pl-10 pr-3.5 text-sm focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15" />
           </div>
-          <div className="relative">
-            <select value={therapistId ?? ""} aria-label="Filter by therapist"
-              onChange={(e) => resetPage(setTherapistId)(e.target.value ? Number(e.target.value) : null)}
-              className="h-10 appearance-none rounded-lg border border-border bg-surface pl-3.5 pr-10 text-sm text-ink focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15">
-              <option value="">All therapists</option>
-              {therapists?.map((t) => <option key={t.id} value={t.id}>{t.full_name}</option>)}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-          </div>
-          <div className="flex rounded-lg border border-border bg-surface p-1" role="group" aria-label="Filter by status">
-            {[{ value: null, label: "All" }, ...PATIENT_STATUSES].map((s) => (
-              <button key={s.label} onClick={() => resetPage(setStatus)(s.value as PatientStatus | null)}
-                aria-pressed={status === s.value}
-                className={cn("rounded-md px-3 py-1.5 text-sm font-medium transition",
-                  status === s.value ? "bg-secondary text-white" : "text-muted hover:text-ink")}>
-                {s.label}
-              </button>
-            ))}
-          </div>
+          <FilterSelect label="Filter by therapist" value={therapistId ? String(therapistId) : ""}
+            onChange={(v) => resetPage(setTherapistId)(v ? Number(v) : null)}
+            options={[{ value: "", label: "All therapists" }, ...(therapists ?? []).map((t) => ({ value: String(t.id), label: t.full_name }))]} />
+          <FilterSelect label="Filter by status" value={status ?? ""}
+            onChange={(v) => resetPage(setStatus)((v || null) as PatientStatus | null)}
+            options={[{ value: "", label: "All statuses" }, ...PATIENT_STATUSES.map((s) => ({ value: s.value, label: s.label }))]} />
         </div>
 
         <Card className={cn("overflow-hidden transition-opacity", isFetching && !isPending && "opacity-70")}>

@@ -19,7 +19,7 @@ const TONES: Record<Tone, string> = {
 export function StatusPill({ status }: { status: string }) {
   const tone = TONE_BY_STATUS[status] ?? "info";
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium", TONES[tone])}>
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium", TONES[tone])}>
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {status.replace("_", " ").replace(/^\w/, (c) => c.toUpperCase())}
     </span>

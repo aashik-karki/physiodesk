@@ -12,8 +12,6 @@ import { GENDERS, PATIENT_STATUSES, formatMoney } from "@/lib/format";
 import { usePackages, useSavePatient } from "@/lib/queries/patients";
 import { useTherapists } from "@/lib/queries/therapists";
 import type { Gender, Patient, PatientInput, PatientStatus } from "@/lib/types";
- import { SessionHistory } from "@/components/patients/session-history";
- import { BookingForm } from "@/components/schedule/booking-form";
 
 // The form keeps every value as a string (that's what inputs give us) and converts on submit.
 interface FormState {

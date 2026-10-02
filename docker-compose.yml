@@ -6,9 +6,36 @@ services:
       POSTGRES_PASSWORD: physiodesk
       POSTGRES_DB: physiodesk
     ports:
-      - "5434:5432"
+      - "5434:5432"        # host 5434 -> container 5432 (5432 is often taken locally)
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U physiodesk"]
+      interval: 3s
+      retries: 20
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://physiodesk:physiodesk@db:5432/physiodesk
+      JWT_SECRET: ${JWT_SECRET:-dev-only-change-me-for-production-0123456789}
+      CLINIC_TIMEZONE: Asia/Kathmandu
+      COOKIE_SECURE: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        API_URL: http://backend:8000
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
 
 volumes:
   pgdata:

@@ -1,5 +1,5 @@
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
@@ -7,11 +7,11 @@ from sqlalchemy.orm import Session
 from app.core.security import (TokenError, create_access_token, create_refresh_token,
                                decode_token, verify_password)
 from app.models import RefreshToken, User
-from sqlalchemy import select
-from sqlalchemy.orm import Session
 
-from app.core.security import create_access_token, create_refresh_token, verify_password
-from app.models import RefreshToken, User
+# Two tabs of the same browser can refresh at the same moment with the same cookie.
+# The second request then presents a token the first one has just rotated. Treat that
+# as normal for a few seconds instead of as theft; replays after that still revoke everything.
+REUSE_GRACE = timedelta(seconds=30)
 
 
 class AuthError(Exception):
@@ -33,8 +33,6 @@ def issue_tokens(db: Session, user: User) -> tuple[str, str]:
     refresh, jti, iat, exp = create_refresh_token(user.id)
     db.add(RefreshToken(jti=jti, user_id=user.id, issued_at=iat, expires_at=exp))
     return access, refresh
-
-
 
 
 def revoke_all(db: Session, user_id: int) -> None:
@@ -60,17 +58,23 @@ def rotate(db: Session, refresh_token: str) -> tuple[User, str, str]:
     if stored is None:
         raise AuthError("Invalid refresh token")
     if stored.revoked_at is not None:
-        revoke_all(db, stored.user_id)
-        db.commit()
-        raise AuthError("Refresh token reuse detected; all sessions revoked")
+        just_rotated = (
+            stored.replaced_by is not None  # rotated, not logged out
+            and datetime.now(UTC) - stored.revoked_at < REUSE_GRACE
+        )
+        if not just_rotated:
+            revoke_all(db, stored.user_id)
+            db.commit()
+            raise AuthError("Refresh token reuse detected; all sessions revoked")
 
     user = db.get(User, stored.user_id)
     if user is None or not user.is_active:
         raise AuthError("Account is disabled")
 
     access, new_refresh = issue_tokens(db, user)
-    stored.revoked_at = datetime.now(UTC)
-    stored.replaced_by = uuid.UUID(decode_token(new_refresh, "refresh")["jti"])
+    if stored.revoked_at is None:  # keep the original rotation time during the grace window
+        stored.revoked_at = datetime.now(UTC)
+        stored.replaced_by = uuid.UUID(decode_token(new_refresh, "refresh")["jti"])
     db.commit()
     return user, access, new_refresh
 
@@ -83,4 +87,4 @@ def revoke(db: Session, refresh_token: str) -> None:
     stored = db.get(RefreshToken, jti)
     if stored and stored.revoked_at is None:
         stored.revoked_at = datetime.now(UTC)
-        db.commit()    
+        db.commit()

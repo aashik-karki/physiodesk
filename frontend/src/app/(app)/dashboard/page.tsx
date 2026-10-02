@@ -12,19 +12,18 @@ import { Alert, EmptyState, Skeleton } from "@/components/ui/feedback";
 import { StatCard } from "@/components/ui/stat-card";
 import { StatusPill } from "@/components/ui/status-pill";
 import { useAuth } from "@/lib/auth";
-import { formatDate, formatLongDate, formatMoney, initials, todayISO } from "@/lib/format";
+import { clinicTimeNow, formatDate, formatLongDate, formatMoney, initials, todayISO } from "@/lib/format";
 import { useDashboard } from "@/lib/queries/dashboard";
 
 function greeting(hour: number) {
   return hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 }
 
-/** "HH:MM:SS" for now, refreshed every minute (used to hide finished appointments). */
+/** Clinic time "HH:MM:SS", refreshed every minute (used to hide finished appointments). */
 function useClock() {
-  const read = () => new Date().toTimeString().slice(0, 8);
-  const [now, setNow] = useState(read);
+  const [now, setNow] = useState(clinicTimeNow);
   useEffect(() => {
-    const id = setInterval(() => setNow(read()), 60_000);
+    const id = setInterval(() => setNow(clinicTimeNow()), 60_000);
     return () => clearInterval(id);
   }, []);
   return now;
@@ -87,22 +86,36 @@ export default function DashboardPage() {
                 : data.recent_patients.length === 0 ? (
                   <EmptyState icon={Users} title="No patients yet" text="New registrations will appear here." />
                 ) : (
-                  <ul className="grid divide-y divide-border sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-3">
-                    {data.recent_patients.map((p) => (
-                      <li key={p.id}>
-                        <Link href={`/patients/${p.id}`} className="flex items-center gap-3 px-5 py-4 transition hover:bg-canvas/70">
-                          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-soft text-sm font-semibold text-primary-ink">
-                            {initials(p.full_name)}
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-ink">{p.full_name}</p>
-                            <p className="truncate text-xs text-muted">{p.condition} · {formatDate(p.created_at)}</p>
-                          </div>
-                          <StatusPill status={p.status} />
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border bg-canvas/60 text-left text-xs font-semibold uppercase tracking-wider text-muted">
+                          <th className="px-5 py-3">Patient</th><th className="px-5 py-3">Condition</th>
+                          <th className="px-5 py-3">Therapist</th><th className="px-5 py-3">Package</th>
+                          <th className="px-5 py-3">Status</th><th className="px-5 py-3">Registered</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {data.recent_patients.map((p) => (
+                          <tr key={p.id} className="hover:bg-canvas/70">
+                            <td className="px-5 py-3">
+                              <Link href={`/patients/${p.id}`} className="flex items-center gap-3">
+                                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-soft text-xs font-semibold text-primary-ink">
+                                  {initials(p.full_name)}
+                                </span>
+                                <span className="font-medium text-ink hover:text-primary">{p.full_name}</span>
+                              </Link>
+                            </td>
+                            <td className="max-w-48 truncate px-5 py-3 text-ink" title={p.condition}>{p.condition}</td>
+                            <td className="whitespace-nowrap px-5 py-3 text-ink">{p.therapist?.full_name ?? <span className="text-muted">Unassigned</span>}</td>
+                            <td className="max-w-48 truncate px-5 py-3 text-ink">{p.package?.name ?? <span className="text-muted">None</span>}</td>
+                            <td className="px-5 py-3"><StatusPill status={p.status} /></td>
+                            <td className="whitespace-nowrap px-5 py-3 text-muted">{formatDate(p.created_at)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
             </Card>
           </>

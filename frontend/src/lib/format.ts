@@ -25,8 +25,6 @@ export function initials(name: string): string {
     .join("");
 }
 
-
-
 /** "2026-10-01T04:15:00Z" or "2026-10-01" -> "1 Oct 2026" */
 export function formatDate(value: string): string {
   const d = value.length === 10 ? new Date(`${value}T00:00:00`) : new Date(value);
@@ -51,8 +49,6 @@ export const GENDERS = [
   { value: "other", label: "Other" },
 ] as const;
 
-
-
 export const SESSION_TYPES = [
   { value: "assessment", label: "Assessment" },
   { value: "treatment", label: "Treatment" },
@@ -76,8 +72,25 @@ export function toISODate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
+/** The clinic's timezone. "Today" and "now" follow the clinic, not the viewer's
+ *  browser, so a reviewer in another country sees the same day as the server. */
+export const CLINIC_TIMEZONE = process.env.NEXT_PUBLIC_CLINIC_TIMEZONE ?? "Asia/Kathmandu";
+
+/** Today's date at the clinic, "YYYY-MM-DD". */
 export function todayISO(): string {
-  return toISODate(new Date());
+  return new Intl.DateTimeFormat("en-CA", { timeZone: CLINIC_TIMEZONE }).format(new Date());
+}
+
+/** The current time at the clinic, "HH:MM:SS" (24h). */
+export function clinicTimeNow(): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: CLINIC_TIMEZONE, hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
+  }).format(new Date());
+}
+
+/** Has `date` + `time` (clinic-local) already started? */
+export function isPastClinicTime(date: string, time: string): boolean {
+  return `${date}T${time}` <= `${todayISO()}T${clinicTimeNow()}`;
 }
 
 export function addDays(iso: string, days: number): string {

@@ -2,7 +2,6 @@ from typing import Annotated
 
 from fastapi import APIRouter, Cookie, HTTPException, Response, status
 from fastapi.responses import JSONResponse
-from fastapi import APIRouter, HTTPException, Response, status
 
 from app.api.deps import CurrentUser, DbSession
 from app.core.config import get_settings

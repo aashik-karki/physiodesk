@@ -28,7 +28,8 @@ export function SessionHistory({ patientId, action }: { patientId: number; actio
               <thead>
                 <tr className="border-b border-border bg-canvas/60 text-left text-xs font-semibold uppercase tracking-wider text-muted">
                   <th className="px-5 py-2.5">Date</th><th className="px-5 py-2.5">Time</th>
-                  <th className="px-5 py-2.5">Therapist</th><th className="px-5 py-2.5">Type</th><th className="px-5 py-2.5">Status</th>
+                  <th className="px-5 py-2.5">Therapist</th><th className="px-5 py-2.5">Type</th>
+                  <th className="px-5 py-2.5">Notes</th><th className="px-5 py-2.5">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -38,6 +39,7 @@ export function SessionHistory({ patientId, action }: { patientId: number; actio
                     <td className="whitespace-nowrap px-5 py-3 font-mono text-[13px] text-ink">{formatTime(a.start_time)}</td>
                     <td className="px-5 py-3 text-ink">{a.therapist.full_name}</td>
                     <td className="px-5 py-3 text-muted">{labelOf(SESSION_TYPES, a.session_type)}</td>
+                    <td className="max-w-56 truncate px-5 py-3 text-muted" title={a.notes ?? undefined}>{a.notes ?? "—"}</td>
                     <td className="px-5 py-3"><StatusPill status={a.status} /></td>
                   </tr>
                 ))}

@@ -27,6 +27,10 @@ export default function BillingPage() {
   const deferredSearch = useDeferredValue(search.trim());
   const { data, isPending, isFetching, error } = useInvoices({ status: tab, search: deferredSearch, page });
 
+  // Voiding the last invoice on the last page of a tab would leave an empty page: step back.
+  const lastPage = data ? Math.max(1, Math.ceil(data.total / INVOICE_PAGE_SIZE)) : 1;
+  if (data && !isFetching && page > lastPage) setPage(lastPage);
+
   const [editing, setEditing] = useState<Invoice | null | undefined>(undefined); // null = new
   const [paying, setPaying] = useState<Invoice | null>(null);
   const [voiding, setVoiding] = useState<Invoice | null>(null);

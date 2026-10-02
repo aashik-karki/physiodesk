@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Alert, Skeleton } from "@/components/ui/feedback";
 import { Modal } from "@/components/ui/modal";
 import { StatusPill } from "@/components/ui/status-pill";
-import { PAYMENT_METHODS, SESSION_TYPES, formatLongDate, formatTime, labelOf } from "@/lib/format";
+import { PAYMENT_METHODS, SESSION_TYPES, formatLongDate, formatTime, isPastClinicTime, labelOf } from "@/lib/format";
 import { useAppointment, useUpdateAppointment, type AppointmentPatch } from "@/lib/queries/schedule";
 import type { Appointment } from "@/lib/types";
 import { SlotFields, type SlotChoice } from "./slot-fields";
 
 function hasStarted(a: Appointment) {
-  return new Date(`${a.date}T${a.start_time}`) <= new Date();
+  return isPastClinicTime(a.date, a.start_time);
 }
 
 export function AppointmentDialog({ appointmentId, onClose, onChanged }: {

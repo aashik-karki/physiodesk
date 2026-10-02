@@ -28,7 +28,7 @@ export function BillingHistory({ patient }: { patient: Patient }) {
     <Card>
       <CardHeader title="Billing history" action={
         <div className="flex items-center gap-3">
-          {due ? <span className="text-sm text-muted">Outstanding <span className="font-mono font-semibold text-danger">{formatMoney(due)}</span></span> : null}
+          {due ? <span className="text-sm text-muted">Outstanding <span className="font-mono font-semibold text-ink">{formatMoney(due)}</span></span> : null}
           {isAdmin && <Button variant="secondary" size="sm" onClick={() => setEditing(null)}><Plus className="h-4 w-4" /> Invoice</Button>}
         </div>
       } />
