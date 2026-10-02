@@ -13,6 +13,11 @@ class DomainError(Exception):
         self.detail = detail
 
 
+
+class BusinessRuleError(DomainError):
+    """Well-formed input that breaks a rule (e.g. end time before start time)."""
+    status_code = status.HTTP_422_UNPROCESSABLE_CONTENT      
+
 class NotFoundError(DomainError):
     status_code = status.HTTP_404_NOT_FOUND
 
@@ -44,3 +49,7 @@ def register_error_handlers(app: FastAPI) -> None:
         name = getattr(getattr(exc.orig, "diag", None), "constraint_name", None)
         detail = CONSTRAINT_MESSAGES.get(name or "", "This change conflicts with existing data.")
         return JSONResponse({"detail": detail}, status_code=status.HTTP_409_CONFLICT)
+
+
+
+  
