@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import { Card } from "./card";
 
 export function StatCard({ label, value, hint, icon: Icon }: {
-  label: string; value: React.ReactNode; hint?: string; icon: LucideIcon;
+  label: string; value: React.ReactNode; hint?: React.ReactNode; icon: LucideIcon;
 }) {
   return (
     <Card className="p-5">

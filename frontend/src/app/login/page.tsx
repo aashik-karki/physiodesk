@@ -46,7 +46,7 @@ function LoginForm() {
         placeholder="you@clinic.com" value={email} onChange={(e) => setEmail(e.target.value)} />
       <Field label="Password" name="password" type="password" autoComplete="current-password" required
         placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
-      <Button type="submit" className="h-11 w-full" disabled={submitting}>
+     <Button type="submit" size="lg" className="w-full" disabled={submitting}>
         {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
         {submitting ? "Signing in…" : "Sign in"}
       </Button>

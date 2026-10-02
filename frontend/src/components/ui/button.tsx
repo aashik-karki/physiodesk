@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger" | "danger-ghost";
-type Size = "sm" | "md";
+type Size = "sm" | "md" | "lg";
 
 const VARIANTS: Record<Variant, string> = {
   primary: "bg-primary text-white shadow-sm hover:brightness-95",
@@ -16,8 +16,8 @@ const VARIANTS: Record<Variant, string> = {
 const SIZES: Record<Size, string> = {
   sm: "h-8 px-3 text-[13px]",
   md: "h-10 px-4 text-sm",
+  lg: "h-11 px-5 text-sm",
 };
-
 export function Button({ variant = "primary", size = "md", className, ...props }:
   React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
   return (

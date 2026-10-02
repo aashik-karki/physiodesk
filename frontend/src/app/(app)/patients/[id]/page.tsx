@@ -1,20 +1,21 @@
 "use client";
 
-   import { ArrowLeft, CalendarDays, MapPin, Package as PackageIcon, Pencil, Phone, Plus, Receipt, Stethoscope, Trash2 } from "lucide-react";
+import { ArrowLeft, CalendarDays, MapPin, Package as PackageIcon, Pencil, Phone, Plus, Stethoscope, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
+import { BillingHistory } from "@/components/patients/billing-history";
 import { DeletePatientDialog } from "@/components/patients/delete-patient-dialog";
 import { PatientForm } from "@/components/patients/patient-form";
+import { SessionHistory } from "@/components/patients/session-history";
+import { BookingForm } from "@/components/schedule/booking-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
-import { Alert, EmptyState, Skeleton } from "@/components/ui/feedback";
+import { Alert, Skeleton } from "@/components/ui/feedback";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDate, formatMoney, initials, todayISO } from "@/lib/format";
 import { usePackages, usePatient } from "@/lib/queries/patients";
-import { SessionHistory } from "@/components/patients/session-history";
-import { BookingForm } from "@/components/schedule/booking-form";
 
 function Detail({ icon: Icon, label, children }: {
   icon: React.ComponentType<{ className?: string }>; label: string; children: React.ReactNode;
@@ -37,7 +38,7 @@ export default function PatientProfilePage() {
   const { data: packages } = usePackages();
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
-     const [booking, setBooking] = useState(false);
+  const [booking, setBooking] = useState(false);
 
   const back = (
     <Link href="/patients" className="inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-ink">
@@ -62,7 +63,7 @@ export default function PatientProfilePage() {
       <PageHeader title="Patient profile" actions={
         <>
           <Button variant="secondary" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /> Edit</Button>
-        <Button variant="danger-ghost" onClick={() => setDeleting(true)}>
+          <Button variant="danger-ghost" onClick={() => setDeleting(true)}>
             <Trash2 className="h-4 w-4" /> Delete
           </Button>
         </>
@@ -101,7 +102,7 @@ export default function PatientProfilePage() {
                 {p.therapist?.full_name ?? <span className="text-muted">Unassigned</span>}
               </Detail>
               <Detail icon={PackageIcon} label="Package">
-                {pkg ? <>{pkg.name} <span className="text-muted">· {pkg.session_count} sessions · <span className="font-mono">{formatMoney(pkg.price)}</span></span></>
+                {pkg ? <>{pkg.name} <span className="text-muted">· {pkg.session_count} session{pkg.session_count === 1 ? "" : "s"} · <span className="font-mono">{formatMoney(pkg.price)}</span></span></>
                   : p.package?.name ?? <span className="text-muted">None</span>}
               </Detail>
               <Detail icon={CalendarDays} label="Registered">{formatDate(p.created_at)}</Detail>
@@ -115,22 +116,18 @@ export default function PatientProfilePage() {
           </Card>
 
           <div className="space-y-6 lg:col-span-2">
-            {/* Filled in by the Schedule (Feature 3) and Billing (Feature 4) work */}
-   <SessionHistory patientId={p.id} action={
-     <Button variant="secondary" size="sm" onClick={() => setBooking(true)}>
-       <Plus className="h-4 w-4" /> Book
-     </Button>
-   } />
-            <Card>
-              <CardHeader title="Billing history" />
-              <EmptyState icon={Receipt} title="No invoices yet" text="Invoices issued to this patient will appear here." />
-            </Card>
+            <SessionHistory patientId={p.id} action={
+              <Button variant="secondary" size="sm" onClick={() => setBooking(true)}>
+                <Plus className="h-4 w-4" /> Book
+              </Button>
+            } />
+            <BillingHistory patient={p} />
           </div>
         </div>
       </main>
 
       {editing && <PatientForm patient={p} onClose={() => setEditing(false)} />}
-           {booking && <BookingForm preset={{ date: todayISO(), patient: p }} onClose={() => setBooking(false)} />}
+      {booking && <BookingForm preset={{ date: todayISO(), patient: p }} onClose={() => setBooking(false)} />}
       {deleting && <DeletePatientDialog patient={p} onClose={() => setDeleting(false)} onDeleted={() => router.replace("/patients")} />}
     </>
   );

@@ -167,3 +167,48 @@ export interface ScheduleOverride {
   reason: string | null;
   created_at: string;
 }
+
+
+// ---- Billing --------------------------------------------------------------
+export type InvoiceStatus = "paid" | "due" | "void";
+
+export interface Invoice {
+  id: number;
+  number: string;           // "INV-00042"
+  patient_id: number | null; // null if the patient record was deleted
+  patient_name: string;
+  appointment_id: number | null;
+  package_id: number | null;
+  service: string;
+  amount: string;
+  discount: string;
+  total: string;
+  status: InvoiceStatus;
+  payment_method: PaymentMethod | null;
+  issued_on: string;
+  paid_at: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface InvoiceInput {
+  patient_id: number;
+  package_id: number | null;
+  service: string;
+  amount: string;
+  discount: string;
+  status: "paid" | "due";
+  payment_method: PaymentMethod | null;
+  issued_on: string;
+  notes: string | null;
+}
+
+export interface InvoicePage extends Page<Invoice> {
+  summary: {
+    paid_total: string;
+    due_total: string;
+    paid_count: number;
+    due_count: number;
+    void_count: number;
+  };
+}
