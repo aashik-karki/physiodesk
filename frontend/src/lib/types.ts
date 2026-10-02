@@ -212,3 +212,20 @@ export interface InvoicePage extends Page<Invoice> {
     void_count: number;
   };
 }
+
+
+// ---- Dashboard ----------------------------------------------------------
+export interface Dashboard {
+  date: string;
+  stats: {
+    patients_today: number;
+    therapists_on_duty: number;
+    revenue_today: string;
+    open_slots_remaining: number;
+    appointments_today: number;
+    appointments_completed: number;
+    outstanding_due: string;
+  };
+  capacity: TherapistDay[];
+  recent_patients: Patient[];
+}
